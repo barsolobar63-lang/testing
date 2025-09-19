@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Payment • Toko Raaka</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0b0b0c;
+    --card:#0f1113;
+    --muted:#9aa3b2;
+    --accent:#7c4dff;
+    --accent-2:#ff3d81;
+    --glass: rgba(255,255,255,0.03);
+    --success:#22c55e;
+    --radius:14px;
+  }
+  *{box-sizing:border-box;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial;color:#e6eef8}
+  html,body{height:100%;margin:0;background:
+    radial-gradient(1200px 600px at 10% 10%, rgba(124,77,255,0.06), transparent 6%),
+    radial-gradient(1000px 500px at 90% 90%, rgba(255,61,129,0.04), transparent 8%),
+    var(--bg);
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+  }
+  .container{max-width:980px;margin:48px auto;padding:28px;}
+  header{display:flex;align-items:center;gap:18px;margin-bottom:18px}
+  .logo {
+    width:68px;height:68px;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent-2));
+    display:grid;place-items:center;font-weight:800;color:#fff;font-size:20px;box-shadow:0 8px 30px rgba(124,77,255,0.12);
+  }
+  header h1{margin:0;font-size:20px;letter-spacing:0.6px}
+  header p{margin:0;color:var(--muted);font-size:13px}
+
+  .grid{display:grid;grid-template-columns:1fr 380px;gap:20px}
+  @media (max-width:880px){ .grid{grid-template-columns:1fr;}}
+  /* Left column (payments) */
+  .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:20px;border-radius:var(--radius);box-shadow:0 10px 30px rgba(2,6,23,0.6);border:1px solid rgba(255,255,255,0.03)}
+  .merchant{display:flex;align-items:center;gap:14px;margin-bottom:14px}
+  .merchant .avatar{width:62px;height:62px;border-radius:10px;background:linear-gradient(180deg,#141416,#0f1113);display:grid;place-items:center;font-weight:700;font-size:18px}
+  .merchant h2{margin:0;font-size:18px}
+  .merchant small{display:block;color:var(--muted);font-size:13px;margin-top:2px}
+
+  .payments{display:flex;flex-direction:column;gap:12px;margin-top:8px}
+  .method{display:flex;align-items:center;gap:12px;padding:14px;border-radius:12px;background:var(--glass);border:1px solid rgba(255,255,255,0.02)}
+  .method .icon{width:56px;height:56px;border-radius:10px;display:grid;place-items:center;font-weight:700;background:linear-gradient(135deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.02)}
+  .method .body{flex:1}
+  .method .body .label{font-weight:700}
+  .method .body .number{margin-top:4px;color:#dbe8ff;letter-spacing:1px;font-weight:700}
+  .method .body .name{margin-top:4px;color:var(--muted);font-size:13px}
+  .buttons{display:flex;gap:8px;margin-left:12px}
+  .btn{
+    padding:8px 10px;border-radius:10px;border:0;background:transparent;color:var(--muted);cursor:pointer;font-weight:600;
+    display:inline-flex;gap:8px;align-items:center;border:1px solid rgba(255,255,255,0.03)
+  }
+  .btn.copy{background:linear-gradient(90deg, rgba(124,77,255,0.08), rgba(255,61,129,0.06));color:#fff;border:1px solid rgba(124,77,255,0.18)}
+  .btn.primary{background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#fff;border:0}
+  .btn:active{transform:translateY(1px)}
+  .muted-line{margin-top:8px;color:var(--muted);font-size:13px}
+
+  /* Right column (QR) */
+  .qcard{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:22px;gap:12px;text-align:center}
+  .qcard img{max-width:100%;height:auto;border-radius:10px;border:1px solid rgba(255,255,255,0.04);background:#fff;padding:10px}
+  .qcard .caption{color:var(--muted);font-size:13px}
+  .qcard .link{display:inline-flex;gap:10px;align-items:center;padding:10px 12px;border-radius:10px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.02);text-decoration:none;color:#fff;font-weight:700}
+  .qr-actions{display:flex;gap:8px;margin-top:6px}
+  .small{font-size:13px;color:var(--muted)}
+
+  footer{margin-top:22px;text-align:center;color:var(--muted);font-size:13px}
+
+  /* tiny helper */
+  .success-toast{position:fixed;right:20px;bottom:20px;background:linear-gradient(90deg,var(--success),#1fae5d);color:#04210b;padding:10px 14px;border-radius:10px;box-shadow:0 10px 30px rgba(2,6,23,0.7);display:none}
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <div class="logo">TR</div>
+    <div>
+      <h1>Toko RAAKA</h1>
+      <p>Metode Pembayaran — Gopay &amp; DANA + QRIS</p>
+    </div>
+  </header>
+
+  <div class="grid">
+    <!-- LEFT: payment methods -->
+    <div class="card">
+      <div class="merchant">
+        <div class="avatar">RA</div>
+        <div>
+          <h2>Toko RAAKA</h2>
+          <small>NMID: ID1025412221414 · A01</small>
+        </div>
+      </div>
+
+      <p class="muted-line">Pilih metode pembayaran, lalu klik salin untuk memudahkan transfer lewat aplikasi dompet digitalmu.</p>
+
+      <div class="payments" aria-live="polite">
+        <!-- GOPAY -->
+        <div class="method" role="group" aria-label="Gopay">
+          <div class="icon" aria-hidden>
+            <svg width="36" height="24" viewBox="0 0 36 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect width="36" height="24" rx="6" fill="white" opacity="0.06"/>
+              <text x="6" y="16" fill="white" font-weight="700" font-size="12">GOPAY</text>
+            </svg>
+          </div>
+          <div class="body">
+            <div class="label">GOPAY</div>
+            <div class="number" id="gopay-number">083821737590</div>
+            <div class="name">A/N A*I JUHA*N**</div>
+          </div>
+          <div class="buttons">
+            <button class="btn copy" onclick="copyText('#gopay-number')">Salin</button>
+            <a class="btn" href="tel:+6283821737590" title="Panggil nomor">Panggil</a>
+          </div>
+        </div>
+
+        <!-- DANA -->
+        <div class="method" role="group" aria-label="DANA">
+          <div class="icon" aria-hidden>
+            <svg width="36" height="24" viewBox="0 0 36 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect width="36" height="24" rx="6" fill="white" opacity="0.04"/>
+              <text x="7" y="16" fill="white" font-weight="700" font-size="12">DANA</text>
+            </svg>
+          </div>
+          <div class="body">
+            <div class="label">DANA</div>
+            <div class="number" id="dana-number">083821737590</div>
+            <div class="name">A/N A*I JUHA*N**</div>
+          </div>
+          <div class="buttons">
+            <button class="btn copy" onclick="copyText('#dana-number')">Salin</button>
+            <a class="btn" href="https://pay.dana.id" target="_blank" rel="noopener">Buka DANA</a>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top:16px;display:flex;gap:12px;flex-wrap:wrap">
+        <a class="btn primary" href="#qris" onclick="openQRIS()" title="Buka QRIS">Buka QRIS</a>
+        <button class="btn" onclick="showHow()">Cara bayar</button>
+      </div>
+
+      <div style="margin-top:16px" class="small">
+        Atau kunjungi: <a href="https://www.aspi-qris.id" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:none">www.aspi-qris.id</a>
+      </div>
+    </div>
+
+    <!-- RIGHT: QR card -->
+    <aside class="card qcard">
+      <!-- Replace qris.png with the actual QR image file or full URL -->
+      <img src="qris.png" id="qris-img" alt="QRIS - scan untuk bayar (ganti qris.png dengan file gambar QRIS Anda)" />
+      <div class="caption">Scan QRIS untuk pembayaran langsung</div>
+
+      <div class="qr-actions">
+        <!-- Download link uses the same image src. If you host externally, it will download from URL. -->
+        <a id="download-qr" class="link" href="qris.png" download="qris-tokoraaka.png" title="Download QRIS">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="opacity:0.95" xmlns="http://www.w3.org/2000/svg"><path d="M12 3v10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 12l7 7 7-7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M20 21H4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Download QR
+        </a>
+
+        <a id="open-qris" class="link" href="https://www.aspi-qris.id" target="_blank" rel="noopener" title="Info QRIS">
+          Info QRIS
+        </a>
+      </div>
+
+      <div class="small" style="margin-top:6px">Atau klik <a href="https://www.aspi-qris.id" target="_blank" rel="noopener" style="color:var(--accent)">tautan QRIS</a></div>
+    </aside>
+  </div>
+
+  <footer>
+    <small>Dicetak oleh: 93600915 · Versi cetak: 1.0.03.07.25</small>
+  </footer>
+</div>
+
+<div id="toast" class="success-toast" role="status" aria-live="polite">Berhasil disalin!</div>
+
+<script>
+  // --- Simple copy-to-clipboard with toast ---
+  function copyText(selector){
+    try {
+      const el = document.querySelector(selector);
+      const text = el?.textContent?.trim();
+      if(!text) return;
+      navigator.clipboard.writeText(text).then(()=>{
+        showToast('Nomor disalin: ' + text);
+      }, ()=>{
+        // fallback
+        const ta = document.createElement('textarea');
+        ta.value = text; document.body.appendChild(ta);
+        ta.select(); document.execCommand('copy'); ta.remove();
+        showToast('Nomor disalin: ' + text);
+      });
+    } catch(e){
+      console.error(e);
+      showToast('Gagal menyalin');
+    }
+  }
+
+  function showToast(msg){
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.style.display = 'block';
+    t.style.opacity = '1';
+    setTimeout(()=>{ t.style.transition='opacity 500ms'; t.style.opacity='0'; }, 1400);
+    setTimeout(()=>{ t.style.display='none'; t.style.transition=''; }, 2000);
+  }
+
+  // Open QRIS - show modal-like replacement (simple)
+  function openQRIS(){
+    const img = document.getElementById('qris-img');
+    const w = window.open("");
+    w.document.write("<title>QRIS - Toko RAAKA</title><style>body{margin:0;background:#000;display:grid;place-items:center;height:100vh}img{max-width:92vw;max-height:92vh}</style>");
+    w.document.write("<img src='"+img.src+"' alt='QRIS' />");
+    w.document.close();
+    return false;
+  }
+
+  function showHow(){
+    alert("Cara bayar:\n1) Buka Aplikasi Gopay/Dana\n2) Pilih Scan QR / Kirim ke nomor\n3) Scan atau tempel nomor\n4) Masukkan nominal dan konfirmasi\n\nAtau gunakan tombol 'Buka QRIS' untuk scan langsung.");
+  }
+
+  // Accessibility: if image missing, replace with placeholder graphic
+  window.addEventListener('load', ()=>{
+    const img = document.getElementById('qris-img');
+    img.addEventListener('error', ()=> {
+      img.src = 'data:image/svg+xml;base64,' + btoa(
+        `<svg xmlns='http://www.w3.org/2000/svg' width='600' height='600' viewBox='0 0 600 600'>
+          <rect width='100%' height='100%' fill='#111'/>
+          <g fill='#888'>
+            <rect x='60' y='60' width='150' height='150' rx='12'/>
+            <rect x='390' y='60' width='150' height='150' rx='12'/>
+            <rect x='60' y='390' width='150' height='150' rx='12'/>
+            <text x='300' y='320' font-size='20' font-family='Inter,Arial' text-anchor='middle' fill='#bbb'>QRIS image not found</text>
+          </g>
+        </svg>`
+      );
+    });
+  });
+</script>
+</body>
+</html>
